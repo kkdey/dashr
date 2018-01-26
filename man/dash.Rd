@@ -99,7 +99,7 @@ mat <- rbind(c(5, 0, 2, 0),
              c(50, 54, 58, 53),
              c(1,1,1,3),
              c(2, 4, 1, 1))
-out <- dash(xmat, optmethod = "mixEM", verbose=TRUE)
-out <- dash(xmat, optmethod = "w_mixEM", verbose=TRUE)
+out <- dash(mat, optmethod = "mixEM", verbose=TRUE)
+out <- dash(mat, optmethod = "w_mixEM", verbose=TRUE)
 
 }
