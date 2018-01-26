@@ -1,0 +1,60 @@
+---
+title: "Adaptive Shrinkage of compositional data and adaptive smoothing using *dashr*"
+shorttitle: "Dirichlet Adaptive Shrinkage"
+author:
+  - name: Kushal K Dey
+    affiliation:
+        - Department of Statistics, University of Chicago
+  - name: Zhengrong Xing
+    affiliation:
+        - Department of Statistics, University of Chicago
+  - name: Dongyue Xie
+    affiliation:
+        - Department of Statistics, University of Chicago
+  - name: Matthew Stephens
+    affiliation:
+        - Department of Statistics, University of Chicago
+        - Department of Human Genetics, University of Chicago
+email: kkdey@uchicago.edu
+package: dashr
+abstract: >
+Compositional data is observed in various settings - composition of chemicals in experiment under lab settings, composition of bases at a particular position of the DNA seqeunce. Often, instead of relative composition or compositional percentages, we observe the counts of the compositional categories in the data. Under such a setting, we present a new strategy called Dirichlet Adaptive Shrinkage (*dash*) that adaptively estimates the true underlying composition effectively. A special case of this model is the Beta adaptive shrinkage for two compositional categories and such an adaptive approach can also be used in adaptive multiscale modeling of timecourse data. We present a R package **dashr** that comprises of all these methods. 
+output:
+  BiocStyle::html_document:
+  toc: TRUE
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8} ---
+  date: "`r Sys.Date()`"
+bibliography: dashr.bib
+---
+
+```{r knitr, echo=FALSE, results="hide"}
+library("knitr")
+opts_chunk$set(tidy=FALSE,tidy.opts=list(width.cutoff=30),dev="png",fig.show="hide",
+               fig.width=4,fig.height=7,
+               message=FALSE, warning = FALSE)
+```
+
+
+```{r style, eval=TRUE, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+# Introduction
+
+```{r knitr, echo=FALSE, results="hide"}
+library("knitr")
+opts_chunk$set(tidy=FALSE,tidy.opts=list(width.cutoff=30),dev="png",fig.show="hide",
+               fig.width=4,fig.height=7,
+               message=FALSE, warning = FALSE)
+```
+
+
+```{r style, eval=TRUE, echo=FALSE, results='asis'}
+BiocStyle::markdown()
+```
+
+# Introduction
+

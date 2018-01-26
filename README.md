@@ -6,14 +6,14 @@
 
 ## Description
 
-We present here a R package for fitting an adaptive method to shrink compositional
-counts data. We assume the input to be compositional counts with samples along columns
-and the composition categories along the rows. The method fits a multinomial model
-on each column, but we choose an adaptive prior - a mixture Dirichlet distribution with
-a given background probability as mean and concentration parameter ranging from very
-high values to very low values (even less than 1). The mixture proportions of the 
-Dirichlet prior are estimated from the data.
-
+Compositional data is observed in various settings - composition of chemicals in experiment 
+under lab settings, composition of bases at a particular position of the DNA seqeunce. Often, 
+instead of relative composition or compositional percentages, we observe the counts of the
+compositional categories in the data. Under such a setting, we present a new strategy called 
+Dirichlet Adaptive Shrinkage (*dash*) that adaptively estimates the true underlying composition
+effectively. A special case of this model is the Beta adaptive shrinkage for two compositional 
+categories and such an adaptive approach can also be used in adaptive multiscale modeling of 
+timecourse data. We present a R package **dashr** that comprises of all these methods.
 
 For model formulation and the model fitting algorithm along with a discussion on
 choices of parameters, please check out our [vignette](vignettes/dash.Rmd)
