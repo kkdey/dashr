@@ -201,24 +201,15 @@ logomaker(out$posmean,color_profile = color_profile,
 
 ## Smoothing 
 
-### Example 1
-
-We consider a Poisson sampled counts data, generated on top of a smooth underlying 
-process.
+### Poisson with no added noise 
 
 ```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
-x <- round(mu + rnorm(400, 0, 1))
-
-##########       dashu         #############################
+x <- sapply(mu, function(x) rpois(1,x))
 
 out <- dashr::dash_smooth(x)
 
-##########    smash   ############################
-
 smash_out <- smashr::smash.poiss(x)
-
-################  Visualization  ######################
 
 plot(x, col = "gray80")
 lines(mu, col = "black", lwd = 4)
@@ -232,18 +223,111 @@ legend("topright", # places a legend at the appropriate place
        col=c("black","red", "blue"))
 ```
 
-### Example 2
+### Poisson with low added noise
+
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- (mu + rnorm(400, 0, 0.1))
+y <- sapply(x, function(x) return(rpois(1,x)))
+
+system.time(out <- dashr::dash_smooth(y))
+
+system.time(smash_out <- smashr::smash.poiss(y))
+
+plot(y, col = "gray80")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 2.5,
+       col=c("black","red", "blue"))
+```
+
+
+### Poisson with high added noise 
+
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- (mu + rnorm(400, 0, 10))
+x[x < 0] = 0
+y <- sapply(x, function(x) return(rpois(1,x)))
+
+system.time(out <- dashr::dash_smooth(y))
+
+system.time(smash_out <- smashr::smash.poiss(y))
+
+plot(y, col = "gray80")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 2.5,
+       col=c("black","red", "blue"))
+```
+
+
+### Low noise integer data  
+
+We consider integer data containing low levels of noise, that fit the mould of a Poisson distribution. 
+
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- round(mu + rnorm(400, 0, 1))
+
+out <- dashr::dash_smooth(x)
+
+smash_out <- smashr::smash.poiss(x)
+
+plot(x, col = "gray80")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 2.5,
+       col=c("black","red", "blue"))
+```
+
+### Poisson GLM model with low noise 
 
 ```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 mu <- c(rep(1, 100), rep(2, 100), rep(3, 100), rep(1, 100))
 x <- (mu + rnorm(400, 0, 0.01))
 y <- sapply(x, function(x) return(rpois(1,exp(x))))
 
-##########       dashu         #############################
-
 out <- dashr::dash_smooth(y)
 
-##########    smash   ############################
+smash_out <- smashr::smash.poiss(y)
+
+plot(y, col = "gray80")
+lines(exp(mu), col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 2.5,
+       col=c("black","red", "blue"))
+```
+
+
+### Poisson GLM model with high noise 
+
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+mu <- c(rep(1, 100), rep(2, 100), rep(3, 100), rep(1, 100))
+x <- (mu + rnorm(400, 0, 1))
+y <- sapply(x, function(x) return(rpois(1,exp(x))))
+
+out <- dashr::dash_smooth(y)
 
 smash_out <- smashr::smash.poiss(y)
 
@@ -260,68 +344,6 @@ legend("topright", # places a legend at the appropriate place
        cex = 2.5,
        col=c("black","red", "blue"))
 ```
-
-### Example 3
-
-```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
-mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
-x <- (mu + rnorm(400, 0, 0.1))
-y <- sapply(x, function(x) return(rpois(1,x)))
-
-##########       dashu         #############################
-
-system.time(out <- dashr::dash_smooth(y))
-
-##########    smash   ############################
-
-system.time(smash_out <- smashr::smash.poiss(y))
-
-################  Visualization  ######################
-
-plot(y, col = "gray80")
-lines(mu, col = "black", lwd = 4)
-lines(out$estimate, col = "red", lwd = 4)
-lines(smash_out, col = "blue")
-legend("topright", # places a legend at the appropriate place
-       c("truth","dash-m", "smash"), # puts text in the legend
-       lty=c(1,1), # gives the legend appropriate symbols (lines)
-       lwd=c(2.5,2.5),
-       cex = 2.5,
-       col=c("black","red", "blue"))
-```
-
-
-### Example 4
-
-```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
-mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
-x <- (mu + rnorm(400, 0, 10))
-x[x < 0] = 0
-y <- sapply(x, function(x) return(rpois(1,x)))
-
-##########       dashu         #############################
-
-system.time(out <- dashr::dash_smooth(y))
-
-##########    smash   ############################
-
-system.time(smash_out <- smashr::smash.poiss(y))
-
-################  Visualization  ######################
-
-plot(y, col = "gray80")
-lines(mu, col = "black", lwd = 4)
-lines(out$estimate, col = "red", lwd = 4)
-lines(smash_out, col = "blue")
-legend("topright", # places a legend at the appropriate place
-       c("truth","dash-m", "smash"), # puts text in the legend
-       lty=c(1,1), # gives the legend appropriate symbols (lines)
-       lwd=c(2.5,2.5),
-       cex = 2.5,
-       col=c("black","red", "blue"))
-```
-
-
 
 
 
