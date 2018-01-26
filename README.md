@@ -1,8 +1,7 @@
-# dash - Dirichlet adaptive shrinkage for compositional data
+# dash - Dirichlet adaptive shrinkage for compositional data with applications in smoothing
 
 
-
-- Authors:    [Kushal K Dey](https://github.com/kkdey),   [Dongyue Xie](https://github.com/DongyueXie),    [Matthew Stephens](http://stephenslab.uchicago.edu/)
+- Authors:    [Kushal K Dey](https://github.com/kkdey),   [Dongyue Xie](https://github.com/DongyueXie), [Zhengrong Xing](https://github.com/zrxing), [Matthew Stephens](http://stephenslab.uchicago.edu/)
 
 
 ## Description
@@ -108,3 +107,7 @@ For any queries or questions or bugs, please open an issue in this Github page o
 
 
 
+=======
+# dashr
+R package for Dirichlet adaptive shrinkage and smoothing
+>>>>>>> 7cd12484796b8a84d75514972352f0938a43556c
