@@ -110,7 +110,7 @@ logomaker(out$posmean,color_profile = color_profile,
           newpage = F)
 ```
 
-<img src="vignettes/test/dash_app.png" alt="Structure Plot" height="700" width="1000">
+<img src="vignettes/test/dash_app.png" alt="dash app " height="700" width="800">
 
 
 We now present an example illustration of adaptive smoothing using the **dashr** package.
@@ -132,7 +132,7 @@ legend("topright", # places a legend at the appropriate place
        col=c("black","red"))
 ```
 
-<img src="vignettes/test/dash_app_2.png" alt="Structure Plot" height="700" width="800">
+<img src="vignettes/test/dash_app_2.png" alt="dash app 2" height="700" width="800">
 
 ## License 
 
