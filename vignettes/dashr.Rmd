@@ -18,7 +18,7 @@ author:
 email: kkdey@uchicago.edu
 package: dashr
 abstract: >
-Compositional data is observed in various settings - composition of chemicals in experiment under lab settings, composition of bases at a particular position of the DNA seqeunce. Often, instead of relative composition or compositional percentages, we observe the counts of the compositional categories in the data. Under such a setting, we present a new strategy called Dirichlet Adaptive Shrinkage (*dash*) that adaptively estimates the true underlying composition effectively. A special case of this model is the Beta adaptive shrinkage for two compositional categories and such an adaptive approach can also be used in adaptive multiscale modeling of timecourse data. We present a R package **dashr** that comprises of all these methods. 
+ Compositional data are observed in various settings - composition of chemicals in a lab experiment, composition of bases at a particular position of the DNA seqeunce etc. Often, instead of relative composition or compositional percentages, the actual counts of the compositional categories in the data are available. Under such a setting, we present a new strategy called Dirichlet Adaptive Shrinkage (*dash*) that adaptively estimates the underlying composition. A special version of this model - for two compositional categories - may be termed Beta Adaptive Shrinkage, which can also be used in adaptive multiscale modeling of timecourse or similar to timecourse data. We present an R package **dashr** for fitting these models. 
 output:
   BiocStyle::html_document:
   toc: TRUE
@@ -27,7 +27,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8} ---
   date: "`r Sys.Date()`"
-bibliography: dashr.bib
 ---
 
 ```{r knitr, echo=FALSE, results="hide"}
@@ -44,17 +43,258 @@ BiocStyle::markdown()
 
 # Introduction
 
-```{r knitr, echo=FALSE, results="hide"}
-library("knitr")
-opts_chunk$set(tidy=FALSE,tidy.opts=list(width.cutoff=30),dev="png",fig.show="hide",
-               fig.width=4,fig.height=7,
-               message=FALSE, warning = FALSE)
+**dashr** is a companion package to the [ashr](https://github.com/stephens999/ashr) package by Matthew Stephens ([@stephens2016false]) which is aimed at adaptive shrinkage of compositional counts data. This model assumes a mixture Dirichlet distribution for the true compositional proportions of categories, where the mixture may in theory comprise of infinitely many components of varying concentrations but all having the same mean. An example application of this method would be in scaling the composition of nucleotides at position of a set of DNA sequences - as in case of Transcription Factor or Protein binding sites. When there are only two categories of composition, the mixture Dirichlet distribution would essentially reduce to mixture Beta distribution and such a distribution can be used to model the message flow proportions along a Poisson multiscale tree model on linearly time varying counts data.This strategy can be used for adaptive smoothing of time varying processes with Poisson sampling. This smoothing strategy can be directly compared to the [smashr](https://github.com/stephenslab/smashr) package written by two of the authors (Z.X and M.S) [@xing2017].
+
+
+# Installation
+
+Please make sure you have the latest version of `r CRANpkg("ashr")`, `r CRANpkg("inline")` and `r CRANpkg("Rcpp")`, `r CRANpkg("LaplacesDemon")` and `r CRANpkg("devtools")`. Then install **dashr** as follows.
+
+```{r eval=FALSE}
+devtools::install_github("kkdey/dashr")
+```
+
+Then load the package with:
+
+```{r load_dashr, cache=FALSE, eval=TRUE,warning=FALSE}
+library(dashr)
+```
+
+----------
+
+# Intuition 
+
+Suppose for a specific position in a sequence, the compositional data is \[ (A, C, G, T) : = (6, 1, 2, 1) \] and in another case, it is \[ (A, C, G, T) : = (600, 100, 200, 100). \]. If we have this compositional data available at every position of the sequence, then we end up with a positional frequency matrix of size $ n \times 4 $, where $n$ is the total number of positions in the sequence. this matrix is called a positional frequncy matrix (PFM). If we transform the positional frequencies into positional weights by taking the sample proportion, then the positional weight matrix (PWM) would be the same for the two cases. However, if we assume the background compositional probability of all bases to be equal at a position, then we have greater evidence to move away from that bakground in the second case, compared to the first, since the second case has 100 times higher total frequency of bases than the first.  Hence, it makes sense to shrink the PWM estimate to the background probability more strongly in the first case than that in the second case.
+
+This is what we accomplish in an adaptive fashion using **dashr**. We discuss the model formulation next. 
+
+# Methods 
+
+## Dirichlet Adaptive Shrinkage
+
+Assume that there are \(L\) constituents in the compositional mix. \(L\) equals \(4\) (corresponding to A,C, G and T bases) for the DNa sequence motif data and \(20\) corresponding to the amino acids for the protein sequence data.
+
+Suppose there are $L$ categories and $n$ positions. We model these compositional counts vectors as follows
+
+\[ (c_{n1}, c_{n2}, \cdots, c_{nL}) \sim Mult \left ( c_{n+} : p_{n1}, p_{n2}, \cdots, p_{nL} \right ) \]
+
+where \(c_{n+}\) is the total frequency of the different constituents of the compositional data observed for the \(n\) th base. \(p_{nl}\) here represents the compositional probability for the $l$ th base in the position $n$. We have
+
+\[ p_{nl} >= 0 \hspace {1 cm} \sum_{l=1}^{L} p_{nl} = 1 \]
+
+We choose the Dirichlet prior distribution on the compositional probability vector \((p_{n1}, p_{n2}, \cdots, p_{nL})\). In order to perform adaptive shrinkage, we assume a mixture of known Dirichlet priors, each having mean to be the background mean probability vector \( \mu_{1}, \mu_{2}, \cdots, \mu_{L} \), but with varying amounts of concentration, which need to be estimated along with the unknown mixture proportions from the data. \[ \left ( p_{n1}, p_{n2}, \cdots, p_{nL} \right ) : = \sum_{k=1}^{K} \pi_{k} Dir \left (\alpha_{k} \mu_{1}, \alpha_{k} \mu_{2}, \cdots, \alpha_{k} \mu_{L} \right ) \hspace {1 cm} \alpha_{k} > 0 \hspace{1 cm} \sum_{l=1}^{L} \mu_{l} = 1 \] 
+We assume a prior of \(\pi_{k}\) to be Dirichlet
+
+\[ f(\pi) : = \prod_{k=1}^{K} {\pi_{k}}^{\lambda_{k}-1} \]
+
+### Default parameters
+
+We choose a default set of \(\alpha_{k}\) to be \((Inf, 100, 50, 20, 10, 2, 1, 0.1, 0.01)\). In this case \(\alpha_{k}=Inf\) corresponds essentially to point mass at the prior mean or background mean \( \mu_{1}, \mu_{2}, \cdots, \mu_{L} \), and then the subsequent choices of \(\alpha_{k}\) have lower degree of concentration. $\alpha_{k} = 1$ corresponds to the most uniform scenario, whereas \(\alpha_{k} < 1\) correspond to cases with probability masses at the edges of the simplex but with the mean at the prior mean. The latter components would direct the points close to the corners towards the corners and away from the center, resulting in clearer separation of the points closer to the mean with the ones away from it.
+
+We choose the default prior amount of shrinkage of \(\pi_{k}\), namely \(\lambda_{k}\) to be \(\left( 1, 1, 1, 1, \cdots, 1 \right )\). The user may want to increase the weight on the first term (corresponding to \( \alpha_{k} = Inf \)  ) to enforce stronger shrinkage. 
+
+## Beta Adaptive Shrinkage in Poisson multiscale model
+
+
+
+# Examples
+
+## Transcription Factor Binding site
+
+```{r,warning=FALSE,message=FALSE,fig.width=7,fig.height=7}
+
+xmat <- cbind(c(5, 0, 2, 0),
+              c(1, 1, 0, 1),
+              c(100, 100, 50, 100),
+              c(20, 50, 100, 10),
+              c(10, 10, 200, 20),
+              c(50, 54, 58, 53),
+              c(1,1,1,3),
+              c(2, 4, 1, 1))
+rownames(xmat) <- c("A", "C", "G", "T")
+colnames(xmat) <- paste0("pos-", 1:dim(xmat)[2])
+xmat_norm <- apply(xmat, 2, function(x) return(x/sum(x)))
+
+xmat
+```
+
+We fit the Dirichlet adaptive shrinkage (dash) model to the position frequency matrix generated above.
+
+
+```{r,warning=FALSE,message=FALSE,fig.width=7,fig.height=7}
+out <- dash(xmat, optmethod = "mixEM", verbose=FALSE, bf=TRUE)
+```
+
+We present the logo plot representations of the PWM matrix obtained by normalizing the sample PFM matrix and the one after applying dash. We use the R package [Logolas](kkdey.github.io/Logolas-pages) to visually represent the logos. 
+
+```{r}
+
+library(Logolas)
+library(grid)
+library(gridBase)
+
+grid.newpage()
+layout.rows <- 1
+layout.cols <- 2
+top.vp <- viewport(layout=grid.layout(layout.rows, layout.cols,
+                                      widths=unit(rep(6,layout.cols), rep("null", 2)),
+                                      heights=unit(c(20,50), rep("lines", 2))))
+
+plot_reg <- vpList()
+l <- 1
+for(i in 1:layout.rows){
+  for(j in 1:layout.cols){
+    plot_reg[[l]] <- viewport(layout.pos.col = j, layout.pos.row = i, name = paste0("plotlogo", l))
+    l <- l+1
+  }
+}
+
+
+plot_tree <- vpTree(top.vp, plot_reg)
+
+color_profile = list("type" = "per_row", 
+                     "col" = RColorBrewer::brewer.pal(4,name ="Spectral"))
+
+pushViewport(plot_tree)
+seekViewport(paste0("plotlogo", 1))
+logomaker(xmat_norm,color_profile = color_profile,
+          frame_width = 1,
+          pop_name = "pre dash PWM",
+          newpage = F)
+
+seekViewport(paste0('plotlogo',2))
+logomaker(out$posmean,color_profile = color_profile,
+          frame_width = 1,
+          pop_name = "post dash PWM",
+          newpage = F)
 ```
 
 
-```{r style, eval=TRUE, echo=FALSE, results='asis'}
-BiocStyle::markdown()
+## Smoothing 
+
+### Example 1
+
+We consider a Poisson sampled counts data, generated on top of a smooth underlying 
+process.
+
+```{r}
+mu <- c(rep(10, 1000), rep(20, 1000), rep(30, 1000), rep(10, 1000))
+x <- round(mu + rnorm(4000, 0, 1))
+
+##########       dashu         #############################
+
+out <- dashr::dash_smooth(x)
+
+##########    smash   ############################
+
+smash_out <- smashr::smash.poiss(x)
+
+################  Visualization  ######################
+
+plot(x, col = "gray80")
+lines(mu, col = "blue", lwd = 2)
+lines(out$estimate, col = "red", lwd = 2)
+lines(smash_out, col = "yellow")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 0.6,
+       col=c("blue","red", "yellow"))
 ```
 
-# Introduction
+### Example 2
+
+```{r}
+mu <- c(rep(1, 100), rep(2, 100), rep(3, 100), rep(1, 100))
+x <- (mu + rnorm(400, 0, 0.01))
+y <- sapply(x, function(x) return(rpois(1,exp(x))))
+
+##########       dashu         #############################
+
+out <- dashr::dash_smooth(y)
+
+##########    smash   ############################
+
+smash_out <- smashr::smash.poiss(y)
+
+################  Visualization  ######################
+
+plot(y, col = "gray80")
+lines(exp(mu), col = "blue", lwd = 2)
+lines(out$estimate, col = "red", lwd = 2)
+lines(smash_out, col = "yellow")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 0.6,
+       col=c("blue","red", "yellow"))
+```
+
+### Example 3
+
+```{r}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- (mu + rnorm(400, 0, 0.1))
+y <- sapply(x, function(x) return(rpois(1,x)))
+
+##########       dashu         #############################
+
+system.time(out <- dashr::dash_smooth(y))
+
+##########    smash   ############################
+
+system.time(smash_out <- smashr::smash.poiss(y))
+
+################  Visualization  ######################
+
+plot(y, col = "gray80")
+lines(mu, col = "blue", lwd = 2)
+lines(out$estimate, col = "red", lwd = 2)
+lines(smash_out, col = "yellow")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 0.6,
+       col=c("blue","red", "yellow"))
+```
+
+
+### Example 4
+
+```{r}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- (mu + rnorm(400, 0, 10))
+x[x < 0] = 0
+y <- sapply(x, function(x) return(rpois(1,x)))
+
+##########       dashu         #############################
+
+system.time(out <- dashr::dash_smooth(y))
+
+##########    smash   ############################
+
+system.time(smash_out <- smashr::smash.poiss(y))
+
+################  Visualization  ######################
+
+plot(y, col = "gray80")
+lines(mu, col = "blue", lwd = 2)
+lines(out$estimate, col = "red", lwd = 2)
+lines(smash_out, col = "yellow")
+legend("topright", # places a legend at the appropriate place
+       c("truth","dash-m", "smash"), # puts text in the legend
+       lty=c(1,1), # gives the legend appropriate symbols (lines)
+       lwd=c(2.5,2.5),
+       cex = 0.6,
+       col=c("blue","red", "yellow"))
+```
+
+
+
+
+
+
 

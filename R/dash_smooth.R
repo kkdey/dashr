@@ -108,7 +108,7 @@ dash_smooth = function(x, concentration = NULL,
   x_odd <- x_ext[c(TRUE,FALSE)]
   x_even <- x_ext[c(FALSE, TRUE)]
 
-  titable=cxxParentTItable(x_ext)
+  titable=ParentTItable(x_ext)
 
   tit=titable$TItable
   ptit=titable$parent
