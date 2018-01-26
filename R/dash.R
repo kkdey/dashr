@@ -326,6 +326,7 @@ dash <- function(comp_data,
   ll$center_prob_local <- posterior_weights[,which(concentration == Inf)]
   ll$center_prob <- rowSums(posterior_weights[, which(concentration > dash_control$fdr_bound)])
   ll$corner_prob <- rowSums(posterior_weights[, which(concentration < 1)])
+  ll$loglik <- sum(matrix_log_lik)
 
   return(ll)
 }
