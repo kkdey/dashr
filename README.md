@@ -104,10 +104,3 @@ logomaker(out$posmean,color_profile = color_profile,
 ## Contact
 
 For any queries or questions or bugs, please open an issue in this Github page or write to Kushal K Dey at [kshldey@gmail.com](kshldey@gmail.com). 
-
-
-
-=======
-# dashr
-R package for Dirichlet adaptive shrinkage and smoothing
->>>>>>> 7cd12484796b8a84d75514972352f0938a43556c

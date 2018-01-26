@@ -1,13 +1,15 @@
-Package: dash
+Package: dashr
 Type: Package
-Title: Dirichlet Adaptive Shrinkage (dash) of Compositional data 
+Title: Dirichlet Adaptive Shrinkage (dash) of Compositional data with applications in smoothing.
 Version: 0.99.0
 Author: c(
     person("Kushal", "Dey", email = "kkdey@uchicago.edu", role = c("aut","cre")),
+    person("Zhengrong", "Xing", email = "zrxing@uchicago.edu", role = c("aut")),
+    person("Dongyue", "Xie", email = "zrxing@uchicago.edu", role = c("aut")),
     person("Matthew", "Stephens", email = "mstephens@uchicago.edu", role = c("ctb")))
 Maintainer: Kushal K. Dey <kkdey@uchicago.edu>
-Description: Performs adaptive shrinkage of compositional counts data using Dirichlet adaptive shrinkage (dash). the package fits a multinomial counts data with a mixture prior of Dirichlet components of varying concentrations (ranging from very high to very low) to adaptively shrink the compositional probabilities. 
-Depends: R (>= 3.3.0), SQUAREM, LaplacesDemon
+Description: Performs adaptive shrinkage of compositional counts data using Dirichlet adaptive shrinkage (dash), and applications of the same in adaptive smoothing in timecourse data.  
+Depends: R (>= 3.3.0), SQUAREM, LaplacesDemon, inline, Rcpp
 License: GPL-3
 URL: https://github.com/kkdey/dash
 LazyData: true

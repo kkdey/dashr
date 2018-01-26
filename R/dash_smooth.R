@@ -1,16 +1,50 @@
+#' @title Adaptive smoothing using Beta adaptive shrinkage
+#'
+#' @description Given a vector of counts, which are noisy estimates of an
+#' underlying Poisson counts data, the function performs adaptive smoothing
+#' of the counts by fitting a Beta adaptive shrinkage model.
+#'
+#' @details The input to dash-smooth is a vector of counts which are noisy
+#' versions of a smooth process. We fit a multiscale model on these counts
+#' and the message flow proportions are assumed to have a flexible mixture
+#' Beta prior centered around mean of 0.5.
+#'
+#' @param x, a vector of counts
+#' @param concentration a vector of concentration scales for different Dirichlet
+#'                   compositions. Defaults to NULL, in which case, we append
+#'                   concentration values of Inf, 100, 50, 20, 10, 5, 2, 1, 0.5
+#'                   and 0.1.
+#' @param pi_init An initial starting value for the mixture proportions. Defaults
+#'                to same proportion for all categories.
+#' @param reflect Boolean indicating if the vector is padded by a reflection of the tail
+#'                or the tailmost value so that the padded vector has length a power of 2.
+#' @param squarem_control A list of control parameters for the SQUAREM/IP algorithm,
+#'              default value is set to be control.default=list(K = 1, method=3,
+#'               square=TRUE, step.min0=1, step.max0=1, mstep=4, kr=1,
+#'               objfn.inc=1,tol=1.e-07, maxiter=5000, trace=FALSE).
+#' @param dash_control A list of control parameters for determining the concentrations
+#'                     and prior weights and fdr control parameters for dash fucntion.
+#' @return Returns a list of the following items
+#'                     \code{estimate}: The adaptively smoothed values of the counts vector \code{x}.
+#'                     \code{pi_weights}: The mixture proportions estimated from different levels of multiscale model.
+#'                     \code{loglik}: The loglikelihood value of the fitted model.
+#'
+#' @examples
+#' mu <- c(rep(10, 50), rep(20, 50), rep(30, 50), rep(10, 50))
+#' x <- mu + rnorm(200, 0, 1)
+#' out <- dash_smooth(x)
+#' out$estimate
+#'
+#' @export
 
-require(Rcpp)
-require(inline)
 
-##############################################################################
-#####################   Smoothing by dash      ###############################
-##############################################################################
+dash_smooth = function(x, concentration = NULL,
+                       pi_init = NULL, reflect = FALSE,
+                       squarem_control = list(),
+                       dash_control = list()){
 
-
-dashu = function(x, concentration = NULL,
-                 pi_init = NULL, reflect = FALSE,
-                 squarem_control = list(),
-                 dash_control = list()){
+  require(Rcpp)
+  require(inline)
 
   if(min(x) < 0){stop ("negative values in x not permitted")}
 
