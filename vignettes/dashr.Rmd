@@ -34,6 +34,7 @@ library("knitr")
 opts_chunk$set(tidy=FALSE,tidy.opts=list(width.cutoff=30),dev="png",fig.show="hide",
                fig.width=4,fig.height=7,
                message=FALSE, warning = FALSE)
+output_dir <- "../vignettes/"
 ```
 
 
