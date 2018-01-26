@@ -50,7 +50,7 @@ BiocStyle::markdown()
 
 Please make sure you have the latest version of `r CRANpkg("ashr")`, `r CRANpkg("inline")` and `r CRANpkg("Rcpp")`, `r CRANpkg("LaplacesDemon")` and `r CRANpkg("devtools")`. Then install **dashr** as follows.
 
-```{r eval=FALSE}
+```{r}
 devtools::install_github("kkdey/dashr")
 ```
 
@@ -95,7 +95,36 @@ We choose the default prior amount of shrinkage of \(\pi_{k}\), namely \(\lambda
 
 ## Beta Adaptive Shrinkage in Poisson multiscale model
 
+Consider a process 
 
+$$  Y_t \sim Poi \left ( \mu_t  \right )  $$
+
+and suppose we are interested in estimating $\mu$. We assume that the function $\mu$ is smooth across time and the noise distribution is Poisson around $\mu$. Once can then apply Poisson multiscale models to estimate the $\mu$.
+
+We know that elementarily, 
+
+$$  Y_1 + Y_2 \sim Poi \left ( \mu_1 + \mu_2  \right ) $$
+
+$$  Y_1 | Y_1 + Y_2 \sim Bin \left (Y_1 + Y_2, \frac{\mu_1}{\mu_1 + \mu_2} \right )$$
+
+We introduce the notation $v_{i:j}$ to denote for a vector $v$, the sum 
+$\sum_{t=i}^{j} v_{t}$. for $T=4$, we can write 
+
+$$ Y_{1:4} \sim Poi \left ( \mu_{1:4} \right ) $$
+$$ Y_{1:2} | Y_{1:4} \sim Bin \left ( Y_{1:4}, \frac{\mu_{1:2}}{\mu_{1:4}} \right ) $$
+$$  Y_{1} | Y_{1:2} \sim Bin \left ( Y_{1:2}, \frac{\mu_{1}}{\mu_{1:2}} \right ) $$
+$$  Y_{3} | Y_{3:4} \sim Bin \left ( Y_{3:4}, \frac{\mu_{3}}{\mu_{3:4}} \right ) $$
+
+Together these models are independent decomposition of the $Y_j \sim Poi (\mu_j)$ process. This decomposition also creates an analog set of parameters corresponding to $\mu = (\mu_1, \mu_2, \mu_3, \mu_4) $ in the prom of 
+$ p = (p_1, p_2, p_3) = ( \mu_{1} / \mu_{1:2}, \mu_{3} / \mu_{3:4}, \mu_{1:2} / \mu_{1:4}) $ and the total intensity $\mu_{1:4}$. 
+
+The vector of parameters $p$ can be treated as the proportional messag flow along the multiscale tree on the counts data, and in our model, are treated as independently generated quantities from a mixture of Beta distributions. 
+
+$$  p_{j} \sim \sum_{k=1}^{K} \pi_{k} Beta (\alpha_{k}, \alpha_{k}) $$
+
+where we assume that $ \alpha_{k}$ are known and are defined in the same way as in the L category **dash** model described above.
+
+This model is then fitted and refined posterior estimates of message flow proportions and corresponding smoothed valuees of the $Y_t$ process is obtained. 
 
 # Examples
 
@@ -121,13 +150,13 @@ xmat
 We fit the Dirichlet adaptive shrinkage (dash) model to the position frequency matrix generated above.
 
 
-```{r,warning=FALSE,message=FALSE,fig.width=7,fig.height=7}
+```{r,warning=FALSE,message=FALSE,fig.width=8,fig.height=9}
 out <- dash(xmat, optmethod = "mixEM", verbose=FALSE, bf=TRUE)
 ```
 
 We present the logo plot representations of the PWM matrix obtained by normalizing the sample PFM matrix and the one after applying dash. We use the R package [Logolas](kkdey.github.io/Logolas-pages) to visually represent the logos. 
 
-```{r}
+```{r,fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 
 library(Logolas)
 library(grid)
@@ -177,9 +206,9 @@ logomaker(out$posmean,color_profile = color_profile,
 We consider a Poisson sampled counts data, generated on top of a smooth underlying 
 process.
 
-```{r}
-mu <- c(rep(10, 1000), rep(20, 1000), rep(30, 1000), rep(10, 1000))
-x <- round(mu + rnorm(4000, 0, 1))
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
+x <- round(mu + rnorm(400, 0, 1))
 
 ##########       dashu         #############################
 
@@ -192,20 +221,20 @@ smash_out <- smashr::smash.poiss(x)
 ################  Visualization  ######################
 
 plot(x, col = "gray80")
-lines(mu, col = "blue", lwd = 2)
-lines(out$estimate, col = "red", lwd = 2)
-lines(smash_out, col = "yellow")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
 legend("topright", # places a legend at the appropriate place
        c("truth","dash-m", "smash"), # puts text in the legend
        lty=c(1,1), # gives the legend appropriate symbols (lines)
        lwd=c(2.5,2.5),
-       cex = 0.6,
-       col=c("blue","red", "yellow"))
+       cex = 2.5,
+       col=c("black","red", "blue"))
 ```
 
 ### Example 2
 
-```{r}
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 mu <- c(rep(1, 100), rep(2, 100), rep(3, 100), rep(1, 100))
 x <- (mu + rnorm(400, 0, 0.01))
 y <- sapply(x, function(x) return(rpois(1,exp(x))))
@@ -221,20 +250,20 @@ smash_out <- smashr::smash.poiss(y)
 ################  Visualization  ######################
 
 plot(y, col = "gray80")
-lines(exp(mu), col = "blue", lwd = 2)
-lines(out$estimate, col = "red", lwd = 2)
-lines(smash_out, col = "yellow")
+lines(exp(mu), col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
 legend("topright", # places a legend at the appropriate place
        c("truth","dash-m", "smash"), # puts text in the legend
        lty=c(1,1), # gives the legend appropriate symbols (lines)
        lwd=c(2.5,2.5),
-       cex = 0.6,
-       col=c("blue","red", "yellow"))
+       cex = 2.5,
+       col=c("black","red", "blue"))
 ```
 
 ### Example 3
 
-```{r}
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
 x <- (mu + rnorm(400, 0, 0.1))
 y <- sapply(x, function(x) return(rpois(1,x)))
@@ -250,21 +279,21 @@ system.time(smash_out <- smashr::smash.poiss(y))
 ################  Visualization  ######################
 
 plot(y, col = "gray80")
-lines(mu, col = "blue", lwd = 2)
-lines(out$estimate, col = "red", lwd = 2)
-lines(smash_out, col = "yellow")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
 legend("topright", # places a legend at the appropriate place
        c("truth","dash-m", "smash"), # puts text in the legend
        lty=c(1,1), # gives the legend appropriate symbols (lines)
        lwd=c(2.5,2.5),
-       cex = 0.6,
-       col=c("blue","red", "yellow"))
+       cex = 2.5,
+       col=c("black","red", "blue"))
 ```
 
 
 ### Example 4
 
-```{r}
+```{r, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 mu <- c(rep(10, 100), rep(20, 100), rep(30, 100), rep(10, 100))
 x <- (mu + rnorm(400, 0, 10))
 x[x < 0] = 0
@@ -281,15 +310,15 @@ system.time(smash_out <- smashr::smash.poiss(y))
 ################  Visualization  ######################
 
 plot(y, col = "gray80")
-lines(mu, col = "blue", lwd = 2)
-lines(out$estimate, col = "red", lwd = 2)
-lines(smash_out, col = "yellow")
+lines(mu, col = "black", lwd = 4)
+lines(out$estimate, col = "red", lwd = 4)
+lines(smash_out, col = "blue")
 legend("topright", # places a legend at the appropriate place
        c("truth","dash-m", "smash"), # puts text in the legend
        lty=c(1,1), # gives the legend appropriate symbols (lines)
        lwd=c(2.5,2.5),
-       cex = 0.6,
-       col=c("blue","red", "yellow"))
+       cex = 2.5,
+       col=c("black","red", "blue"))
 ```
 
 
