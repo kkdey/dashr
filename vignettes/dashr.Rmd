@@ -304,7 +304,7 @@ mu <- c(rep(1, 100), rep(2, 100), rep(3, 100), rep(1, 100))
 x <- (mu + rnorm(400, 0, 0.01))
 y <- sapply(x, function(x) return(rpois(1,exp(x))))
 
-out <- dashr::dash_smooth(y)
+out <- dashr::dash_smooth(y, reflect = TRUE)
 
 smash_out <- smashr::smash.poiss(y)
 

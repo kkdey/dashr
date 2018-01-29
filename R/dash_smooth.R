@@ -39,7 +39,7 @@
 
 
 dash_smooth = function(x, concentration = NULL,
-                       pi_init = NULL, reflect = FALSE,
+                       pi_init = NULL, reflect = TRUE,
                        squarem_control = list(),
                        dash_control = list()){
 
@@ -99,10 +99,28 @@ dash_smooth = function(x, concentration = NULL,
 
   if(reflect){
     extended_len <- 2^{ceiling(log(length(x), base=2))}
-    x_ext <- c(x, tail(x, extended_len - length(x)))
+    if(extended_len > length(x)){
+      pos_to_fill <- extended_len - length(x)
+      pos_to_fill_1 <- floor(pos_to_fill/2)
+      pos_to_fill_2 <- pos_to_fill - pos_to_fill_1
+      if(pos_to_fill_1 >= 1){
+        x_ext <- c(rev(head(x, pos_to_fill_1)), x, rev(tail(x, pos_to_fill_2)))
+      }else{
+        x_ext <- c(x, rev(tail(x, pos_to_fill_2)))
+      }
+    }
   }else{
     extended_len <- 2^{ceiling(log(length(x), base=2))}
-    x_ext <- c(x, rep(tail(x, 1), extended_len - length(x)))
+    if(extended_len > length(x)){
+      pos_to_fill <- extended_len - length(x)
+      pos_to_fill_1 <- floor(pos_to_fill/2)
+      pos_to_fill_2 <- pos_to_fill - pos_to_fill_1
+      if(pos_to_fill_1 >= 1){
+        x_ext <- c(rep(head(x,1), pos_to_fill_1), x, rep(tail(x, 1), pos_to_fill_2))
+      }else{
+        x_ext <- c(x, rep(tail(x, 1), pos_to_fill_2))
+      }
+    }
   }
 
   x_odd <- x_ext[c(TRUE,FALSE)]
@@ -138,9 +156,10 @@ dash_smooth = function(x, concentration = NULL,
   est=reverse.pp(tit,pi_weights,concentration2,2)
   est2 <- est - mean(est) + mean(x_ext)
 
-  ll <- list("estimate" = est2[1:length(x)],
-               "pi_weights" = pi_weights,
-               "loglik" = loglik)
+  ll <- list("estimate" = est2[(pos_to_fill_1+1):(pos_to_fill_1 + length(x))],
+             "full_est" = est2,
+             "pi_weights" = pi_weights,
+             "loglik" = loglik)
 
   return(ll)
 }

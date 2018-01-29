@@ -4,7 +4,7 @@
 \alias{dash_smooth}
 \title{Adaptive smoothing using Beta adaptive shrinkage}
 \usage{
-dash_smooth(x, concentration = NULL, pi_init = NULL, reflect = FALSE,
+dash_smooth(x, concentration = NULL, pi_init = NULL, reflect = TRUE,
   squarem_control = list(), dash_control = list())
 }
 \arguments{
