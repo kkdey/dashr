@@ -5,7 +5,7 @@
 \title{Adaptive smoothing using Beta adaptive shrinkage}
 \usage{
 dash_smooth(x, concentration = NULL, pi_init = NULL, reflect = TRUE,
-  squarem_control = list(), dash_control = list())
+  squarem_control = list(), dash_control = list(), progressbar = TRUE)
 }
 \arguments{
 \item{x, }{a vector of counts}
@@ -28,6 +28,9 @@ default value is set to be control.default=list(K = 1, method=3,
 
 \item{dash_control}{A list of control parameters for determining the concentrations
 and prior weights and fdr control parameters for dash fucntion.}
+
+\item{progressbar}{Boolean indicating whether to show the progress bar for
+the code run or not. Defaults to TRUE}
 }
 \value{
 Returns a list of the following items

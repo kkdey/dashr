@@ -132,7 +132,7 @@ legend("topright", # places a legend at the appropriate place
        col=c("black","red"))
 ```
 
-<img src="vignettes/test/dash_app2.png" alt="dash appp" height="700" width="800">
+<img src="inst/doc/dash_app2.png" alt="dash appp" height="700" width="800">
 
 ## License 
 

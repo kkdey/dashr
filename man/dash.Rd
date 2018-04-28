@@ -5,7 +5,7 @@
 \title{Dirichlet adaptive shrinkage of compositional data using dash}
 \usage{
 dash(comp_data, concentration = NULL, mode = NULL, optmethod = c("mixEM",
-  "w_mixEM", "mixIP"), sample_weights = NULL, verbose = FALSE, bf = TRUE,
+  "w_mixEM"), sample_weights = NULL, verbose = FALSE, bf = TRUE,
   pi_init = NULL, squarem_control = list(), dash_control = list(),
   reportcov = FALSE)
 }
@@ -23,9 +23,8 @@ to equal means for all components.}
 
 \item{optmethod}{The method for performing optimization of the mixture
 proportions or grades of memberships for the different
-Dirichlet compositions. Can be either of "mixEM", "w_mixEM"
-or weighted mixEM and "mixIP" for interior point convex
-optimization.}
+Dirichlet compositions. Can be either of EM ("mixEM")
+or weighted mixEM ("w_mixEM").}
 
 \item{sample_weights}{The weights of the samples for performing the optimization.
 Defaults to NULL, in which case the weight is same for each sample.}
@@ -44,8 +43,9 @@ default value is set to be control.default=list(K = 1, method=3,
  square=TRUE, step.min0=1, step.max0=1, mstep=4, kr=1,
  objfn.inc=1,tol=1.e-07, maxiter=5000, trace=FALSE).}
 
-\item{dash_control}{A list of control parameters for determining the concentrations
-and prior weights and fdr control parameters for dash fucntion.}
+\item{dash_control}{A list of control parameters for determining the
+concentrations and prior weights and fdr control
+parameters for dash fucntion.}
 
 \item{reportcov}{A boolean indicating whether the user wants to return
 the covariance and correlation structure of the posterior.

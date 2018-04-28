@@ -1,6 +1,6 @@
 Package: dashr
 Type: Package
-Title: Dirichlet Adaptive Shrinkage (dash) of Compositional data with applications in smoothing.
+Title: Dirichlet Adaptive Shrinkage (dash) of Compositional data with applications in smoothing
 Version: 0.99.0
 Author: c(
     person("Kushal", "Dey", email = "kkdey@uchicago.edu", role = c("aut","cre")),
@@ -9,10 +9,10 @@ Author: c(
     person("Matthew", "Stephens", email = "mstephens@uchicago.edu", role = c("ctb")))
 Maintainer: Kushal K. Dey <kkdey@uchicago.edu>
 Description: Performs adaptive shrinkage of compositional counts data using Dirichlet adaptive shrinkage (dash), and applications of the same in adaptive smoothing in timecourse data.  
-Depends: R (>= 3.3.0), SQUAREM, LaplacesDemon, inline, Rcpp, ashr
+Depends: R (>= 3.3.0), Rcpp, inline
 License: GPL-3
 URL: https://github.com/kkdey/dash
 LazyData: true
-Imports: SQUAREM, LaplacesDemon
-Suggests: Logolas, grid, gridBase, gridExtra
+Imports: SQUAREM, LaplacesDemon, Matrix
+Suggests: grid, gridBase, gridExtra, ashr
 RoxygenNote: 6.0.1

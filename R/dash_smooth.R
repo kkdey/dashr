@@ -24,6 +24,8 @@
 #'               objfn.inc=1,tol=1.e-07, maxiter=5000, trace=FALSE).
 #' @param dash_control A list of control parameters for determining the concentrations
 #'                     and prior weights and fdr control parameters for dash fucntion.
+#' @param progressbar Boolean indicating whether to show the progress bar for
+#'                    the code run or not. Defaults to TRUE
 #' @return Returns a list of the following items
 #'                     \code{estimate}: The adaptively smoothed values of the counts vector \code{x}.
 #'                     \code{pi_weights}: The mixture proportions estimated from different levels of multiscale model.
@@ -35,16 +37,17 @@
 #' out <- dash_smooth(x)
 #' out$estimate
 #'
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @import Rcpp
+#' @importFrom inline cxxfunction
 #' @export
 
 
 dash_smooth = function(x, concentration = NULL,
                        pi_init = NULL, reflect = TRUE,
                        squarem_control = list(),
-                       dash_control = list()){
-
-  require(Rcpp)
-  require(inline)
+                       dash_control = list(),
+                       progressbar = TRUE){
 
   if(min(x) < 0){stop ("negative values in x not permitted")}
 
@@ -138,7 +141,7 @@ dash_smooth = function(x, concentration = NULL,
   loglik = 0
 
   pi_weights <- matrix(0, dim(ns)[1], length(concentration))
-  pb <- txtProgressBar(min = 0, max = dim(ns)[1], style = 3)
+  if(progressbar) pb <- txtProgressBar(min = 0, max = dim(ns)[1], style = 3)
 
   for(k in 1:dim(ns)[1]){
     mat <- rbind(ns[k,], nf[k, ])
@@ -146,7 +149,7 @@ dash_smooth = function(x, concentration = NULL,
     out <- dash2(mat, conc_mat, prior, pi_init, squarem_control)
     loglik = loglik + out$loglik
     pi_weights[k,] <- out$pi
-    setTxtProgressBar(pb, k)
+    if(progressbar) setTxtProgressBar(pb, k)
   }
 
   close(pb)
@@ -282,7 +285,7 @@ src <- '
         }
         return(List::create(Named("TItable")=TItable, Named("parent")=parent));
 '
-cxxParentTItable <- cxxfunction(signature(sig="numeric"),
+cxxParentTItable <- inline::cxxfunction(signature(sig="numeric"),
                                 body=src,
                                 plugin="Rcpp",
                                 inc="#include <cmath>")

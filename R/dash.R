@@ -34,9 +34,8 @@
 #'             to equal means for all components.
 #' @param optmethod The method for performing optimization of the mixture
 #'               proportions or grades of memberships for the different
-#'               Dirichlet compositions. Can be either of "mixEM", "w_mixEM"
-#'               or weighted mixEM and "mixIP" for interior point convex
-#'               optimization.
+#'               Dirichlet compositions. Can be either of EM ("mixEM")
+#'               or weighted mixEM ("w_mixEM").
 #' @param sample_weights The weights of the samples for performing the optimization.
 #'               Defaults to NULL, in which case the weight is same for each sample.
 #' @param verbose if TRUE, outputs messages tracking progress of the method.
@@ -49,8 +48,9 @@
 #'              default value is set to be control.default=list(K = 1, method=3,
 #'               square=TRUE, step.min0=1, step.max0=1, mstep=4, kr=1,
 #'               objfn.inc=1,tol=1.e-07, maxiter=5000, trace=FALSE).
-#' @param dash_control A list of control parameters for determining the concentrations
-#'                     and prior weights and fdr control parameters for dash fucntion.
+#' @param dash_control A list of control parameters for determining the
+#'                     concentrations and prior weights and fdr control
+#'                     parameters for dash fucntion.
 #' @param reportcov A boolean indicating whether the user wants to return
 #'                  the covariance and correlation structure of the posterior.
 #'                  Defaults to FALSE.
@@ -80,6 +80,8 @@
 #' out <- dash(mat, optmethod = "mixEM", verbose=TRUE)
 #' out <- dash(mat, optmethod = "w_mixEM", verbose=TRUE)
 #'
+#' @importFrom stats cov2cor
+#' @importFrom utils head modifyList tail
 #' @export
 #'
 
@@ -87,7 +89,7 @@
 dash <- function(comp_data,
                  concentration = NULL,
                  mode = NULL,
-                 optmethod = c("mixEM", "w_mixEM", "mixIP"),
+                 optmethod = c("mixEM", "w_mixEM"),
                  sample_weights = NULL,
                  verbose = FALSE,
                  bf = TRUE,
@@ -228,8 +230,6 @@ dash <- function(comp_data,
     fit=do.call("mixEM",args = list(matrix_lik= matrix_lik, prior=prior, pi_init=pi_init, control=squarem_control))
   }else if (optmethod == "w_mixEM"){
     fit=do.call("w_mixEM",args = list(matrix_lik= matrix_lik, prior=prior, pi_init=pi_init, control=squarem_control, weights=sample_weights))
-  }else if (optmethod == "mixIP"){
-    fit=do.call("mixIP",args = list(matrix_lik= matrix_lik, prior=prior, pi_init=pi_init, control=squarem_control))
   }else{
     message("optmethod npt provided correctly: switching to mixEM")
     fit=do.call("mixEM",args = list(matrix_lik= matrix_lik, prior=prior, pi_init=pi_init, control=squarem_control))

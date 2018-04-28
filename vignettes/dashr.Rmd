@@ -157,46 +157,20 @@ out <- dash(xmat, optmethod = "mixEM", verbose=FALSE, bf=TRUE)
 
 We present the logo plot representations of the PWM matrix obtained by normalizing the sample PFM matrix and the one after applying dash. We use the R package [Logolas](kkdey.github.io/Logolas-pages) to visually represent the logos. 
 
-```{r,fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
+```{r,message = FALSE, warning = FALSE, fig.align = "left", fig.show="asis", dpi=144, fig.width=13, fig.height=12}
 
 library(Logolas)
 library(grid)
-library(gridBase)
-
-grid.newpage()
-layout.rows <- 1
-layout.cols <- 2
-top.vp <- viewport(layout=grid.layout(layout.rows, layout.cols,
-                                      widths=unit(rep(6,layout.cols), rep("null", 2)),
-                                      heights=unit(c(20,50), rep("lines", 2))))
-
-plot_reg <- vpList()
-l <- 1
-for(i in 1:layout.rows){
-  for(j in 1:layout.cols){
-    plot_reg[[l]] <- viewport(layout.pos.col = j, layout.pos.row = i, name = paste0("plotlogo", l))
-    l <- l+1
-  }
-}
-
-
-plot_tree <- vpTree(top.vp, plot_reg)
-
-color_profile = list("type" = "per_row", 
-                     "col" = RColorBrewer::brewer.pal(4,name ="Spectral"))
-
-pushViewport(plot_tree)
+Logolas::get_viewport_logo(1, 2, heights_1 = 20)
 seekViewport(paste0("plotlogo", 1))
-logomaker(xmat_norm,color_profile = color_profile,
-          frame_width = 1,
-          pop_name = "pre dash PWM",
-          newpage = F)
+logomaker(xmat_norm,
+          type = "Logo",
+          logo_control = list(newpage = FALSE, pop_name = "pre dash PWM"))
 
 seekViewport(paste0('plotlogo',2))
-logomaker(out$posmean,color_profile = color_profile,
-          frame_width = 1,
-          pop_name = "post dash PWM",
-          newpage = F)
+logomaker(out$posmean,
+         type = "Logo",
+         logo_control = list(newpage = FALSE, pop_name = "pre dash PWM") )
 ```
 
 
