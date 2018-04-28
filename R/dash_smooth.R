@@ -152,7 +152,7 @@ dash_smooth = function(x, concentration = NULL,
     if(progressbar) setTxtProgressBar(pb, k)
   }
 
-  close(pb)
+  if(progressbar) close(pb)
 
   concentration2 <- concentration
   concentration2[concentration2 == Inf] <- 10^10
