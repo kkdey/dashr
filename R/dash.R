@@ -269,7 +269,7 @@ dash <- function(comp_data,
   for(n in 1:dim(comp_data)[1]){
     for(k in 1:dim(conc_mat)[1]){
       temp <-  comp_data[n,]+ conc_mat[k,]
-      posmean_comp[n,,k] <- (temp+1e-08)/sum(temp+1e-08)
+      posmean_comp[n,,k] <- (temp+1e-20)/sum(temp+1e-20)
     }
   }
 
