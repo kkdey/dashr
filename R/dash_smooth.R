@@ -112,6 +112,7 @@ dash_smooth = function(x, concentration = NULL,
         x_ext <- c(x, rev(tail(x, pos_to_fill_2)))
       }
     }else if(extended_len == length(x)){
+      pos_to_fill_1 <- 0
       x_ext <- x
     }else{
       stop("error in extending the vector to make its size a power of 2")
@@ -128,6 +129,7 @@ dash_smooth = function(x, concentration = NULL,
         x_ext <- c(x, rep(tail(x, 1), pos_to_fill_2))
       }
     }else if(extended_len == length(x)){
+      pos_to_fill_1 <- 0
       x_ext <- x
     }else{
       stop("error in extending the vector to make its size a power of 2")
